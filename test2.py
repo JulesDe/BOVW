@@ -115,16 +115,16 @@ dir=os.listdir(DBpath)
 		
 		for f in path(dire).walkfiles():
 					if k<30:
-						if os.path.exists(SavePathHist + '/hist-' + dir[i] + str(k+1)):				#Test existence des histogrammes
+						if os.path.exists(SavePathHist + '/hist-' + dir[i] + str(k+1)):	#Test existence des histogrammes
 							if k==29:
 								print('Histograms already computed.')
 								print('Jumping to next folder...')
 							k=k+1
-						else:																		#Création si nécessaire de l'histogramme correspondant à l'image en cours
+						else:		#Création si nécessaire de l'histogramme correspondant à l'image en cours
 							descriptors=cPickle.load(open(SavePath + '/desc-' + dir[i] + str(k+1))) #Chargement des descripteurs de cette image
 							histo = zeros(6000)
-							for l in descriptors:													#Calcul pour chaque descripteur du centre le plus proche (toute la boucle for)
-								min = distance(l-centers[0])							#et ajout de +1 dans histo à l'indice correspondant à ce centre
+							for l in descriptors:					#Calcul pour chaque descripteur du centre le plus proche (toute la boucle for)
+								min = distance(l-centers[0])		#et ajout de +1 dans histo à l'indice correspondant à ce centre
 								indice = 0
 								for j in arange(6000):
 									if (distance(l-centers[j])<min):
