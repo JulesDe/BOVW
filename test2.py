@@ -5,16 +5,25 @@ import sys
 from path import path
 import cPickle
 
+
 class err(Exception):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
+		
+def distance (a, b): #Définition distance L1 entre 2 arrays de même longueur
+	n = len(a)
+	dist = 0
+	for i in arange(n):
+		dist = dist + abs(a[i]-b[i])
+	return dist
+	
 NbImg=30; # Nombre d'images par folder a prendre en compte
-DBpath="./dataset/paris" # chemin database contenant les dossiers categories
+DBpath="C:\Users\Jules\Desktop\HTI 2015 2016\PFE\BDD Paris\Paris" # chemin database contenant les dossiers categories
 SavePath="./Desc" # chemin de sauvegarde des descripteurs
-
+SavePathHist="./Hist"
 # On verifie si la BDD existe
 if os.path.exists(SavePath + '/desfinal'):
 	dd=cPickle.load(open(SavePath + "desfinal"))
@@ -92,6 +101,38 @@ flags = cv2.KMEANS_RANDOM_CENTERS
 # Apply KMeans
 print("\n\nApplying kmeans...")
 ret,labels,centers = cv2.kmeans(desc,6000,criteria,10,flags)
+
+# Calculs histogrammes 
+
+print("CALCUL DES HISTOGRAMMES DES IMAGES")
+
+dir=os.listdir(DBpath)
+	for i in range(0,len(dir)):
+		dire= DBpath + '/' + dir[i]
+		print("\nTraitement de "+ dire)
+		
+		k=0
+		
+		for f in path(dire).walkfiles():
+					if k<30:
+						if os.path.exists(SavePathHist + '/hist-' + dir[i] + str(k+1)):				#Test existence des histogrammes
+							if k==29:
+								print('Histograms already computed.')
+								print('Jumping to next folder...')
+							k=k+1
+						else:																		#Création si nécessaire de l'histogramme correspondant à l'image en cours
+							descriptors=cPickle.load(open(SavePath + '/desc-' + dir[i] + str(k+1))) #Chargement des descripteurs de cette image
+							histo = zeros(6000)
+							for l in descriptors:													#Calcul pour chaque descripteur du centre le plus proche (toute la boucle for)
+								min = distance(l-centers[0])							#et ajout de +1 dans histo à l'indice correspondant à ce centre
+								indice = 0
+								for j in arange(6000):
+									if (distance(l-centers[j])<min):
+										min = distance(l-centers[j]
+										indice = j
+								histo[j] += 1
+							k=k+1
+							cPickle.dump(histo, open(SavePathHist + "/hist-" + dir[i] + str(k), "wb"))	#Sauvegarde de l'histogramme en cours
 
 # Debut du SVM
 # svc = svm.SVC(kernel='linear')
